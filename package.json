@@ -1,0 +1,24 @@
+{
+  "name": "hackathon",
+  "version": "1.0.0",
+  "description": "Hackathon ADR",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rabinneslo/hackathon.git"
+  },
+  "keywords": [
+    "hackathon",
+    "education",
+    "adr"
+  ],
+  "author": "Rabin Neslo",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rabinneslo/hackathon/issues"
+  },
+  "homepage": "https://github.com/rabinneslo/hackathon#readme"
+}
