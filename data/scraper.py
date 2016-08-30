@@ -1,18 +1,24 @@
 #!python
-import csv, io, json, requests
+import csv, io, json, string, re, requests
 
 def main():
 
     besturen = list(parseBevoegdGezag(readCSV('bevoegdgezag.csv')))
-    print(besturen[0])
+    with open('besturen.json', 'w', encoding='latin-1') as f:
+         json_string = json.dumps(besturen, ensure_ascii=False)
+         f.write(json_string)
+
     scholen = list(parseScholen(readCSV('basisscholen.csv')))
-    print(scholen[0])
-    for bestuur in besturen:
-        bestuur['scholen'] = [school for school in scholen if school['bg_nr'] == bestuur['bg_nr']]
+
+    with open('scholen.json', 'w', encoding='latin-1') as f:
+         json_string = json.dumps(scholen, ensure_ascii=False)
+         f.write(json_string)
+    # for bestuur in besturen:
+    #     bestuur['scholen'] = [school for school in scholen if school['bg_nr'] == bestuur['bg_nr']]
     
-    with open('dataschools.json', 'w', encoding='latin-1') as f:
-        json_string = json.dumps(besturen, ensure_ascii=False)
-        f.write(json_string);
+    # with open('dataschools.json', 'w', encoding='latin-1') as f:
+    #     json_string = json.dumps(besturen, ensure_ascii=False)
+    #     f.write(json_string)
         #print bestuur['naam'], len(bestuur['scholen'])
 
 def parseBevoegdGezag(rows):
@@ -50,7 +56,10 @@ def mapRowBevoegdGezag(row):
     result['soorten'] = row[16].split(' + ')
     result['scholen'] = []
     result['locatie'] = {}
-    r = requests.get('http://boskopu.com:9200/koiri/_search?q=url:'+result['adres']['postcode']+'-'+result['adres']['straat']+'-'+result['adres']['huisnummer'])
+    number, prefix = getNumberandPrefix(result['adres']['huisnummer'])
+    result['adres']['toevoeging'] = prefix
+    postcode = result['adres']['postcode'].replace(' ', '')
+    r = requests.get('http://boskopu.com:9200/koiri/_search?q=code:'+postcode+'+number:'+number)
     result['locatie']['lat'] = 0
     result['locatie']['lon'] = 0
     if r.status_code == 200:
@@ -59,7 +68,8 @@ def mapRowBevoegdGezag(row):
             source = data['hits']['hits'][0]['_source']
             if source and source['position']:
                 result['locatie']['lat'] = source['position']['lat']
-                result['locatie']['lon'] = source['position']['lon']      
+                result['locatie']['lon'] = source['position']['lon'] 
+                result['adres']['plaats'] = source['place']     
     return result
 
 def mapRowSchool(row, personeel):
@@ -84,10 +94,13 @@ def mapRowSchool(row, personeel):
     result['contact'] = {}
     result['contact']['telefoon'] = row[11]
     result['contact']['website'] = row[12]
-    result['personeel'] = [item for item in personeel if item['bg_nr'] == result['bg_nr'] and item['brin_nr'] == result['brin_nr']]
+    # result['personeel'] = [item for item in personeel if item['bg_nr'] == result['bg_nr'] and item['brin_nr'] == result['brin_nr']]
     
     result['locatie'] = {}
-    r = requests.get('http://boskopu.com:9200/koiri/_search?q=url:'+result['adres']['postcode']+'-'+result['adres']['straat']+'-'+result['adres']['huisnummer'])
+    number, prefix = getNumberandPrefix(result['adres']['huisnummer'])
+    result['adres']['toevoeging'] = prefix
+    postcode = result['adres']['postcode'].replace(' ', '')
+    r = requests.get('http://boskopu.com:9200/koiri/_search?q=code:'+postcode+'+number:'+number)
     result['locatie']['lat'] = 0
     result['locatie']['lon'] = 0
     if r.status_code == 200:
@@ -97,6 +110,7 @@ def mapRowSchool(row, personeel):
             if source and source['position']:
                 result['locatie']['lat'] = source['position']['lat']
                 result['locatie']['lon'] = source['position']['lon']
+                result['adres']['plaats'] = source['place']
     
     return result
 
@@ -148,6 +162,33 @@ def mapRowPersoneel(row):
         item['fte']['0.5-0.8'] = fte_05_08[i]
         item['fte']['0.8-1.0'] = fte_08[i]
         result['statistieken'].append(item)
+    return result
+
+def strip_punctuation(s):
+    return ''.join(c for c in s if c not in string.punctuation)
+
+def getNumberandPrefix(s):
+    number = ''
+    prefix = ''
+    numberdetails = getNumberDetails(s)
+    if len(numberdetails) == 1:
+        number = numberdetails[0]
+    elif len(numberdetails) == 2:
+        number = numberdetails[0]
+        if re.match('[A-Za-z]', numberdetails[1]):
+            prefix = numberdetails[1]
+
+    return number, prefix
+
+def getNumberDetails(s):
+    print(s)
+    if '-' in s:
+        return s.split('-')
+    else:
+        return s.split('/')
+
+def mapRowCito(row):
+    result = {}
     return result
 
 def readCSV(path):
