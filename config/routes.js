@@ -7,6 +7,11 @@ module.exports = function (app, io) {
     schoolRouter.route('/')
         .get(require('../api/school/index').get);
     app.use('/api/school', schoolRouter);
+
+    let bestuurRouter = express.Router();
+    bestuurRouter.route('/')
+        .get(require('../api/bestuur/index').get);
+    app.use('/api/bestuur', bestuurRouter);
     // Always send index.html
     // let sendIndex = (req, res, next)=> {
     //     res.sendFile('index.html');

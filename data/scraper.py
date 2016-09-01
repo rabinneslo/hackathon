@@ -207,7 +207,7 @@ def mapRowCito(row):
 
     result['brin_nr'] = row[0];
     
-    result['samensteling'] = {}
+    result['samenstelling'] = {}
     result['scores'] = {}
 
     samenstelling = {}
@@ -223,7 +223,7 @@ def mapRowCito(row):
     samenstelling['Overig'] = percToFloat(row[48]) + percToFloat(row[54])
     samenstelling['DeMolukken'] = percToFloat(row[42])
     samenstelling['Nederland'] = 1 - (samenstelling['Antillen']+samenstelling['Suriname']+samenstelling['Marokko']+samenstelling['Turkije']+samenstelling['Tunesie']+samenstelling['ZuidEuropa']+samenstelling['OostEuropa']+samenstelling['Kaapverdie']+samenstelling['Overig']+samenstelling['DeMolukken'])
-    result['samensteling'] = samenstelling
+    result['samenstelling'] = samenstelling
 
     toets = {}
     toets['naam'] = row[5]
