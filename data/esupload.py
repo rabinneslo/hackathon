@@ -5,6 +5,7 @@ def main():
    es = Elasticsearch()
    besturen = loadJSON('besturen.json')
    scholen = loadJSON('scholen.json')
+   leerlingen = loadJSON('leerlingen')
    for bestuur in besturen:
        huisnummer = ''
        if '-' in bestuur['adres']['huisnummer']:

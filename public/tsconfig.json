@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators":true,
+    "isolatedModules" : true,
+    "module": "system",
+    "target": "es5",
+    "sourceMap": true,
+    "noEmitOnError": false
+  }
+}

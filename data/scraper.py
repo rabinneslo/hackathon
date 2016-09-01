@@ -2,17 +2,25 @@
 import csv, io, json, string, re, requests
 
 def main():
+    scores = list(parseCitoScores(readCSV('cito_basisscholen.csv')))
+    with open('cito.json', 'w', encoding='latin-1') as f:
+        json_string = json.dumps(scores, ensure_ascii=False)
+        f.write(json_string)
 
-    besturen = list(parseBevoegdGezag(readCSV('bevoegdgezag.csv')))
-    with open('besturen.json', 'w', encoding='latin-1') as f:
-         json_string = json.dumps(besturen, ensure_ascii=False)
-         f.write(json_string)
+    leerlingen = list(parseLeerlingen(readCSV('leeftijden_basisscholen.csv')))
+    with open('leerlingen.json', 'w', encoding='latin-1') as f:
+        json_string = json.dumps(leerlingen, ensure_ascii=False)
+        f.write(json_string)    
+    # besturen = list(parseBevoegdGezag(readCSV('bevoegdgezag.csv')))
+    # with open('besturen.json', 'w', encoding='latin-1') as f:
+    #      json_string = json.dumps(besturen, ensure_ascii=False)
+    #      f.write(json_string)
 
-    scholen = list(parseScholen(readCSV('basisscholen.csv')))
+    # scholen = list(parseScholen(readCSV('basisscholen.csv')))
 
-    with open('scholen.json', 'w', encoding='latin-1') as f:
-         json_string = json.dumps(scholen, ensure_ascii=False)
-         f.write(json_string)
+    # with open('scholen.json', 'w', encoding='latin-1') as f:
+    #      json_string = json.dumps(scholen, ensure_ascii=False)
+    #      f.write(json_string)
     # for bestuur in besturen:
     #     bestuur['scholen'] = [school for school in scholen if school['bg_nr'] == bestuur['bg_nr']]
     
@@ -33,6 +41,14 @@ def parseScholen(rows):
 def parsePersoneel(rows):
     for row in rows:
         yield mapRowPersoneel(row)
+
+def parseLeerlingen(rows):
+    for row in rows:
+        yield mapRowLeerling(row)
+
+def parseCitoScores(rows):
+    for row in rows:
+        yield mapRowCito(row)
 
 def mapRowBevoegdGezag(row):
     result = {}
@@ -164,6 +180,74 @@ def mapRowPersoneel(row):
         result['statistieken'].append(item)
     return result
 
+def mapRowLeerling(row):
+    result = {}
+    result['brin_nr'] = row[0]
+    result['bg_nr'] = row[2]
+    result['leerlingen'] = {}
+
+    result['leerlingen']['totaal'] = int(row[-1].replace('.', ''))
+    result['leerlingen']['leeftijd14'] = int(row[-2].replace('.', ''))
+    result['leerlingen']['leeftijd13'] = int(row[-3].replace('.', ''))
+    result['leerlingen']['leeftijd12'] = int(row[-4].replace('.', ''))
+    result['leerlingen']['leeftijd11'] = int(row[-5].replace('.', ''))
+    result['leerlingen']['leeftijd10'] = int(row[-6].replace('.', ''))
+    result['leerlingen']['leeftijd9'] = int(row[-7].replace('.', ''))
+    result['leerlingen']['leeftijd8'] = int(row[-8].replace('.', ''))
+    result['leerlingen']['leeftijd7'] = int(row[-9].replace('.', ''))
+    result['leerlingen']['leeftijd6'] = int(row[-10].replace('.', ''))
+    result['leerlingen']['leeftijd5'] = int(row[-11].replace('.', ''))
+    result['leerlingen']['leeftijd4'] = int(row[-12].replace('.', ''))
+    result['leerlingen']['leeftijd3'] = int(row[-13].replace('.', ''))
+
+    return result;
+
+def mapRowCito(row):
+    result = {}
+
+    result['brin_nr'] = row[0];
+    
+    result['samensteling'] = {}
+    result['scores'] = {}
+
+    samenstelling = {}
+    samenstelling['jaar'] = int(row[4][0:4])
+    samenstelling['Antillen'] = percToFloat(row[41])+percToFloat(row[47])
+    samenstelling['Suriname'] = percToFloat(row[51])
+    samenstelling['Marokko'] = percToFloat(row[46])
+    samenstelling['Turkije'] = percToFloat(row[53])
+    samenstelling['Tunesie'] = percToFloat(row[52])
+    samenstelling['Kaapverdie'] = percToFloat(row[45])
+    samenstelling['OostEuropa'] = percToFloat(row[55])
+    samenstelling['ZuidEuropa'] = percToFloat(row[43]) + percToFloat(row[44]) + percToFloat(row[49]) + percToFloat(row[50])
+    samenstelling['Overig'] = percToFloat(row[48]) + percToFloat(row[54])
+    samenstelling['DeMolukken'] = percToFloat(row[42])
+    samenstelling['Nederland'] = 1 - (samenstelling['Antillen']+samenstelling['Suriname']+samenstelling['Marokko']+samenstelling['Turkije']+samenstelling['Tunesie']+samenstelling['ZuidEuropa']+samenstelling['OostEuropa']+samenstelling['Kaapverdie']+samenstelling['Overig']+samenstelling['DeMolukken'])
+    result['samensteling'] = samenstelling
+
+    toets = {}
+    toets['naam'] = row[5]
+    toets['jaar'] = int(row[4][0:4])
+    toets['score'] = {}
+    toets['score']['verwacht'] = 0
+    if len(row[-3]) > 0: 
+        toets['score']['verwacht'] = float(row[-3].replace(',', '.'))
+    toets['score']['toegevoegd'] = 0
+    if len(row[-2]) > 0: 
+        toets['score']['toegevoegd'] = float(row[-2].replace(',', '.'))
+    toets['score']['ware'] = 0
+    if len(row[-1]) > 0:
+        toets['score']['ware'] = float(row[-1].replace(',', '.'))
+    result['scores'] = toets
+
+    return result
+
+def percToFloat(str):
+    item = str.replace('%', '')
+    item = item.replace(',', '.')
+
+    return float(item)/100.0
+
 def strip_punctuation(s):
     return ''.join(c for c in s if c not in string.punctuation)
 
@@ -186,10 +270,6 @@ def getNumberDetails(s):
         return s.split('-')
     else:
         return s.split('/')
-
-def mapRowCito(row):
-    result = {}
-    return result
 
 def readCSV(path):
     with open(path,'rU', encoding='latin-1') as file:
