@@ -104,7 +104,7 @@ gulp.task('server', function () {
  * $ gulp
  * Define the default sass task
  */
-gulp.task('default', ['html', 'sass', 'ts2js', 'server', 'watch'], () => {
+gulp.task('default', ['server', 'html', 'sass', 'ts2js', 'watch'], () => {
 	console.log('Online!');
 });
 // clean up if an error goes unhandled.

@@ -1,0 +1,124 @@
+<link rel="stylesheet" href="css/style.min.css">
+<script src="js/jquery.min.js"></script>
+<script src="d3/build/d3.js"></script>
+<script src="js/topojson.min.js"></script>
+<script>
+    $( document ).ready(function() {
+        d3.json('json/cities.json', (error, cities)=>{
+            d3.json('api/school', (error, schools)=>{
+                console.log(error);
+                let data = {cities: cities, schools:schools};
+                this.height = 800;
+            this.width = 960;
+            this.measure = 'leerlingen';
+            this.container = d3.select('body').append('svg')
+                               .attr('height', this.height)
+                               .attr('width', this.width);
+            let merc = d3.geoMercator();
+            console.log(merc);
+            // Coordinates of Suriname
+            var lattop = 50.75119191657173,
+                lonleft = 3.358524099218433,
+                lonright = 6.15414;
+
+            /**
+             * Make the scale so that the difference of longitude is
+             * exactly the width of the image
+             */
+            var scale = 20 * this.width / (lonright - lonleft);
+            /**
+             * Translate the origin of the map to [0,0] as a start,
+             * not to the now meaningless default of [480,250]
+             */
+            merc.scale(scale);
+            merc.translate([this.width/8, this.height/1.45]);
+            merc.center([3.358524099218433,50.75119191657173]);
+
+            let geometries = topojson.feature(data.cities, data.cities.objects.gemeenten).features;
+
+            let gemeenten = data
+                .schools
+                .aggregations
+                .gemeenten
+                .buckets
+                .map((x)=>
+                    {
+                        let geometry = geometries.find(geo=> geo.properties.name.search(new RegExp(x.key, "i")) != -1);
+                        if(!geometry){console.log(x.key);}
+                         return {
+                            key: x.key, 
+                            centroid: merc(d3.geoCentroid(geometry)),
+                            leerlingen: x.leerlingen.value, 
+                            rijksbijdrage : x.bijdrage ? x.bijdrage.value : 0,
+                            scores: x.scores.value,
+                            afstand: x.afstand ? x.afstand.value : 0
+                        }
+                    });
+            let citoAdvies = [
+                {advies:'Vmbo', score:533},
+                {advies:'Havo', score:536},
+                {advies:'Havo/vwo', score:540},
+                {advies:'Vwo', score:542}
+            ];
+            let coloursYGB = ["#00a6ca","#90eb9d","#f9d057","#d7191c"].reverse();
+        
+            let colorScale = d3.scaleThreshold()
+                .domain(citoAdvies.map(x=>x.score))
+                .range(coloursYGB);
+                    
+            let leerlingenScale = d3.scaleLinear()
+                .domain(d3.extent(gemeenten, (d)=>d.leerlingen))
+                .range([2,15]);
+            
+            let rijksbijdrageScale = d3.scaleLinear()
+                .domain(d3.extent(gemeenten, (d)=>d.rijksbijdrage))
+                .range([2,15]);
+
+            let afstandScale = d3.scaleLinear()
+                .domain(d3.extent(gemeenten, (d)=>d.afstand))
+                .range([2,15]);
+
+            this.scales = {
+                'leerlingen': leerlingenScale,
+                'rijksbijdrage' : rijksbijdrageScale,
+                'afstand' : afstandScale
+            }
+            let path = d3.geoPath().projection(merc);
+            this.container
+                .append("path")
+                .datum(topojson.feature(data.cities, data.cities.objects.gemeenten))
+                .attr("class", "geo_gemeenten")
+                .attr("d", path);
+            // let group = this.container
+            //     .append('g')
+		    //     .attr('transform', 'translate(' + 0 + ', ' + 0 + ')')
+            
+            let circles = this.container.selectAll('.gemeenten')
+                .data(gemeenten)
+                .enter()
+                .append('circle')
+                .attr('class', 'gemeenten')
+                .attr('r', (d)=>0)
+                .attr('cy', (d)=>d.centroid[1])
+                .attr('cx', (d)=>d.centroid[0])
+                .style('fill', (d)=>colorScale(d.scores))
+                .style('stroke', 'white')
+                .style('stroke-opacity', 0.3)
+                .style("opacity", 0);
+            
+            circles.transition("move")
+                .duration(2000)
+                .delay((d,i)=>i%20)
+                .ease(d3.easeSinInOut)
+                .attr('r', (d)=>this.scales[this.measure](d[this.measure]))
+            circles.transition('highlight')
+                .duration(2000)
+                .ease(d3.easeSinInOut)
+                .style("opacity", 0.6)
+            })
+        });
+
+    });
+
+</script>
+

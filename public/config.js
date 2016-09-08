@@ -14,7 +14,7 @@
   var packages = {
     'app':                        { main: 'main.js',  defaultExtension: 'js' },
     'rxjs':                       { defaultExtension: 'js' },
-    'd3':                         { main: 'index.js',  defaultExtension: 'js' }
+    'd3':                         { main: 'build/d3.js',  defaultExtension: 'js' }
   };
   var ngPackageNames = [
     'common',

@@ -17,10 +17,7 @@ module.exports = (app,io) => {
     app.set('showStackError', true);
     // should be placed before express.static
     app.use(compress({
-        filter: function (req, res) {
-            return /json|text|javascript|css/.test(res.getHeader('Content-Type'))
-        },
-        level: 5
+        level: 9
     }));
     app.use(require('connect-livereload')());
 

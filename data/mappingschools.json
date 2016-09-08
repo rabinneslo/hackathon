@@ -1,0 +1,430 @@
+PUT /adr/_mapping/school
+{
+    "school":{
+        "_all": {
+              "search_analyzer": "whitespace_analyzer",
+              "analyzer": "nGram_analyzer"
+        },
+        "properties": {
+            "brin_nr" : {
+                "type" : "string",
+                "fields": {
+                    "raw": {
+                        "type":"string",
+                        "index": "not_analyzed"
+                    }
+                }
+            },
+            "bg_nr" : {
+                "type" : "string",
+                "fields": {
+                    "raw": {
+                        "type":"string",
+                        "index": "not_analyzed"
+                    }
+                }
+            },
+            "naam" : {
+                "type" : "string",
+                "fields": {
+                    "raw": {
+                        "type":"string",
+                        "index": "not_analyzed"
+                    }
+                }
+            },
+            "type" : {
+                "type" : "string",
+                "fields": {
+                    "raw": {
+                        "type":"string",
+                        "index": "not_analyzed"
+                    }
+                }
+            },
+            "locatie" : {
+                "type" : "geo_point",
+                "geohash": "true",
+                "geohash_prefix": "true"
+            },
+            "adres":{
+                "properties": {
+                    "straat" : {
+                        "type" : "string",
+                        "fields": {
+                            "raw": {
+                                "type":"string",
+                                "index": "not_analyzed"
+                            }
+                        }
+                    },
+                    "huisnummer" : {
+                        "type" : "integer"
+                    },
+                    "toevoeging": {
+                        "type" : "string",
+                        "index": "not_analyzed"
+                    },
+                    "postcode" : {
+                        "type" : "string",
+                        "fields": {
+                            "raw": {
+                                "type":"string",
+                                "index": "not_analyzed"
+                            }
+                        }
+                    },
+                    "plaats" : {
+                        "type" : "string",
+                        "fields": {
+                            "raw": {
+                                "type":"string",
+                                "index": "not_analyzed"
+                            }
+                        }
+                    },
+                    "gemeente" : {
+                        "type" : "string",
+                        "fields": {
+                            "raw": {
+                                "type":"string",
+                                "index": "not_analyzed"
+                            }
+                        }
+                    },
+                    "provincie" : {
+                        "type" : "string",
+                        "fields": {
+                            "raw": {
+                                "type":"string",
+                                "index": "not_analyzed"
+                            }
+                        }
+                    },
+                    "gemeente_nr" : {
+                        "type" : "string",
+                        "index": "not_analyzed"
+                    }
+                }
+            },
+            "contact":{
+                "properties": {
+                    "telefoon":{
+                        "type": "string",
+                        "index": "not_analyzed"
+                    },
+                    "website":{
+                        "type": "string"
+                    }
+                }
+            },
+            "leerlingen":{
+                "properties": {
+                    "totaal": {
+                        "type": "integer"
+                    }   
+                }
+            },
+            "score":{
+                "properties": {
+                    "soort":{
+                        "type": "string",
+                        "index": "not_analyzed"
+                    },
+                    "ware": {
+                        "type": "double"
+                    },
+                    "verwacht":{
+                        "type": "double"
+                    },
+                    "correctie":{
+                        "type": "double"
+                    }
+                }
+            },
+            "samenstelling":{
+                "properties": {
+                    "surinaams":{
+                        "type":"integer"
+                    },
+                    "antiliaans":{
+                        "type":"integer"
+                    },
+                    "marokaans":{
+                        "type":"integer"
+                    },
+                    "turks":{
+                        "type":"integer"
+                    },
+                    "tunees":{
+                        "type":"integer"
+                    },
+                    "kaapverdisch":{
+                        "type":"integer"
+                    },
+                    "joegoslaaf":{
+                        "type":"integer"
+                    },
+                    "zuideuropees":{
+                        "type":"integer"
+                    },
+                    "moluks":{
+                        "type":"integer"
+                    },
+                    "overig":{
+                        "type":"integer"
+                    },
+                    "nederlands":{
+                        "type":"integer"
+                    },
+                    "rest":{
+                        "type":"integer"
+                    }
+                }
+            },
+            "afstand":{
+                "type": "double"
+            },
+            "reisafstand":{
+                "type": "double"
+            },
+            "reistijd":{
+                "type": "double"
+            },
+            "kosten":{
+                "properties": {
+                    "materieel":{
+                        "properties": { 
+                            "bedrag": {
+                                "type": "double"
+                            },
+                            "aandeel":{
+                                "type": "double"
+                            },
+                            "kostprijs":{
+                                "type": "double"
+                            }
+                        }
+                    },
+                    "personeel":{
+                        "properties": { 
+                            "bedrag": {
+                                "type": "double"
+                            },
+                            "aandeel":{
+                                "type": "double"
+                            },
+                            "kostprijs":{
+                                "type": "double"
+                            }
+                        }
+                    },
+                    "totaal":{
+                        "properties":{
+                            "bedrag": {
+                                "type": "double"
+                            },
+                            "kostprijs":{
+                                "type": "double"
+                            }
+                        }
+                    }
+                }
+            },
+            "personeel":{
+                "properties": {
+                    "totaal": {
+                        "type": "integer"
+                    },
+                    "fulltime":{
+                        "type": "integer"
+                    },
+                    "parttime":{
+                        "type": "integer"
+                    },
+                    "leeftijd":{
+                        "type": "double"
+                    },
+                    "directie":{
+                        "properties":{
+                            "aantal": {
+                            "type": "integer"
+                        },
+                            "percentage":{
+                                "type": "double"
+                            },
+                            "fulltime":{
+                                "type": "double"
+                            },
+                            "parttime":{
+                                "type": "double"
+                            },
+                            "leeftijd":{
+                                "type": "double"
+                            },
+                            "mannen": {
+                                "properties":{
+                                    "aantal": {
+                                        "type": "integer"
+                                    },
+                                    "percentage":{
+                                        "type": "double"
+                                    },
+                                    "leeftijd":{
+                                        "type": "double"
+                                    }
+                                }
+                            },
+                            "vrouwen": {
+                                "properties":{
+                                    "aantal": {
+                                        "type": "integer"
+                                    },
+                                    "percentage":{
+                                        "type": "double"
+                                    },
+                                    "leeftijd":{
+                                        "type": "double"
+                                    }
+                                }
+                            },
+                            "onbekend":{
+                                "properties":{
+                                    "aantal": {
+                                        "type": "integer"
+                                    },
+                                    "percentage":{
+                                        "type": "double"
+                                    },
+                                    "leeftijd":{
+                                        "type": "double"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "docenten":{
+                        "properties":{
+                            "aantal": {
+                                "type": "integer"
+                            },
+                            "percentage":{
+                                "type": "double"
+                            },
+                            "fulltime":{
+                                "type": "double"
+                            },
+                            "parttime":{
+                                "type": "double"
+                            },
+                            "leeftijd":{
+                                "type": "double"
+                            },
+                            "mannen": {
+                                "properties":{
+                                    "aantal": {
+                                        "type": "integer"
+                                    },
+                                    "percentage":{
+                                        "type": "double"
+                                    },
+                                    "leeftijd":{
+                                        "type": "double"
+                                    }
+                                }
+                            },
+                            "vrouwen": {
+                                "properties":{
+                                    "aantal": {
+                                        "type": "integer"
+                                    },
+                                    "percentage":{
+                                        "type": "double"
+                                    },
+                                    "leeftijd":{
+                                        "type": "double"
+                                    }
+                                }
+                            },
+                            "onbekend":{
+                                "properties":{
+                                    "aantal": {
+                                        "type": "integer"
+                                    },
+                                    "percentage":{
+                                        "type": "double"
+                                    },
+                                    "leeftijd":{
+                                        "type": "double"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "ondersteuners":{
+                        "properties":{
+                            "aantal": {
+                                "type": "integer"
+                            },
+                            "percentage":{
+                                "type": "double"
+                            },
+                            "leeftijd":{
+                                "type": "double"
+                            },
+                            "fulltime":{
+                                "type": "double"
+                            },
+                            "parttime":{
+                                "type": "double"
+                            },
+                            "mannen": {
+                                "properties":{
+                                    "aantal": {
+                                        "type": "integer"
+                                    },
+                                    "percentage":{
+                                        "type": "double"
+                                    }
+                                }
+                            },
+                            "vrouwen": {
+                                "properties":{
+                                    "aantal": {
+                                        "type": "integer"
+                                    },
+                                    "percentage":{
+                                        "type": "double"
+                                    }
+                                }
+                            },
+                            "onbekend":{
+                                "properties":{
+                                    "aantal": {
+                                        "type": "integer"
+                                    },
+                                    "percentage":{
+                                        "type": "double"
+                                    },
+                                    "leeftijd":{
+                                        "type": "double"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "gewicht":{
+                "properties":{
+                    "aantal": {
+                        "type": "integer"
+                    },
+                    "eenheid":{
+                        "type": "double"
+                    }
+                }
+            }
+        }
+    }
+}
